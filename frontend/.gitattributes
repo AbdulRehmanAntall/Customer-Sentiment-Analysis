@@ -1,0 +1,24 @@
+# Set default text file handling for Windows/Linux compatibility
+* text=auto
+
+# Python files
+*.py text diff=python
+
+# JavaScript & JSX files
+*.js text
+*.jsx text
+
+# JSON files
+*.json text
+
+# SQL files
+*.sql text
+
+# Ignore audio files and binaries (if any future ASR testing)
+*.mp3 binary
+*.wav binary
+
+# UTF-8 encoding for better multi-language support (including Urdu)
+*.txt text eol=lf
+*.html text eol=lf
+*.css text eol=lf
