@@ -1,0 +1,28 @@
+# Python virtualenv
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Python environment variables
+.env
+
+# Logs
+*.log
+
+# Database files
+*.db
+*.sqlite
+*.bak
+*.mdf
+*.ldf
+
+# VSCode / JetBrains / system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.swp
+*.swo
