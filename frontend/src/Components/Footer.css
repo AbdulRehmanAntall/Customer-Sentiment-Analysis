@@ -1,0 +1,30 @@
+.footer {
+  width: 100%;
+  background-color: #a1c6e1;
+  padding: 1rem 2rem;
+  text-align: center;
+  color: var(--text-color);
+  box-shadow: var(--card-shadow);
+  margin-top: auto;
+}
+
+.footer p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+}
+
+.footer-links {
+  margin-top: 0.5rem;
+}
+
+.footer-links a {
+  margin: 0 12px;
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer-links a:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}

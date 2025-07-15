@@ -1,0 +1,69 @@
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding-top: 80px;
+    padding-bottom: 2rem;
+    justify-content: center;
+}
+
+.landing-card {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #e4f0fa;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
+}
+
+.landing-text {
+    flex: 1;
+    text-align: left;
+}
+
+.main-heading {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #184f80;
+    margin-bottom: 1.5rem;
+}
+
+.mission-statement {
+    font-size: 1.4rem;
+    color: #333;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.button-group {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.button-group button {
+    background-color: #357abd;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button-group button:hover {
+    background-color: #255d9d;
+}
+
+.landing-image img {
+    max-width: 450px;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
