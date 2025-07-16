@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "dev": "vite",
     "start-backend": "cd ../Backend && .\\venv\\Scripts\\activate && python app.py",
+    
     "start-dev": "concurrently \"npm run dev\" \"npm run start-backend\""
   },
   "dependencies": {

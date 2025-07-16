@@ -70,7 +70,7 @@ const DashBoard = () => {
       ];
 
       const responses = await Promise.all(
-        endpoints.map(endpoint => 
+        endpoints.map(endpoint =>
           axios.get(`http://127.0.0.1:5000/api/${endpoint}`, { params })
         )
       );

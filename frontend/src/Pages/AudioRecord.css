@@ -1,0 +1,44 @@
+.audio-container {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 24px;
+    background: #fefefe;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.audio-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.language-select,
+.upload-section,
+.record-controls {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.submit-btn {
+    padding: 12px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background: #0056b3;
+}
+
+.result {
+    margin-top: 20px;
+    background: #f4f4f4;
+    padding: 16px;
+    border-radius: 10px;
+}
