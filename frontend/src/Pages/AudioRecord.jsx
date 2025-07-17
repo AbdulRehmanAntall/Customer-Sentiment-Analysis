@@ -152,7 +152,12 @@ const AudioRecord = () => {
                             </p>
                         </>
                     )}
-
+                    {result.ai_suggestions && (
+                        <>
+                            <h3>🤖 AI Suggestions:</h3>
+                            <p>{result.ai_suggestions}</p>
+                        </>
+                    )}
                     {result.file_path && (
                         <>
                             <h3>📁 File Saved At:</h3>

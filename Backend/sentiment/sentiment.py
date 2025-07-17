@@ -17,6 +17,8 @@ AudioSegment.converter = r"C:\Users\DELL\ffmpeg\bin\ffmpeg.exe"
 # Flask blueprint
 sentiment = Blueprint('sentiment', __name__)
 
+
+
 # Upload folder
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "audio_files")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -64,22 +66,44 @@ def analyze_audio():
                 ]
             )
             translated_text = response.choices[0].message.content.strip()
-
+           
         # Sentiment analysis
         sentiment_input = translated_text if translated_text else transcript
         blob = TextBlob(sentiment_input)
         polarity = blob.sentiment.polarity
         sentiment_label = "POSITIVE" if polarity > 0 else "NEGATIVE" if polarity < 0 else "NEUTRAL"
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are an AI assistant working for PTCL/Ufone to support customer service quality assurance. "
+                        "Given the transcript of a customer call and the detected sentiment, generate a short (1–3 line) professional remark. "
+                        "This note should be directed to a team supervisor and briefly describe the situation, tone, and recommended action. "
+                        "Keep it respectful, actionable, and easy to scan quickly."
+                    )
+                },
+                {
+                    "role": "user",
+                    "content": f"Transcript: {translated_text if translated_text else transcript}. Sentiment: {sentiment_label}."
+                }
+            ]
+        )
 
+            
+        
+        ai_suggestions = response.choices[0].message.content.strip()
         return jsonify({
-            "file_path": filepath,
-            "transcript": transcript,
-            "translated": translated_text,
-            "sentiment": {
-                "label": sentiment_label,
-                "score": polarity
-            }
-        })
+                "file_path": filepath,
+                "transcript": transcript,
+                "translated": translated_text,
+                "sentiment": {
+                    "label": sentiment_label,
+                    "score": polarity,
+                },
+                "ai_suggestions": ai_suggestions
+            })
 
     except Exception as e:
         print("❌ Error:", e)
