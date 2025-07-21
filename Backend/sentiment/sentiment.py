@@ -5,7 +5,7 @@ from textblob import TextBlob
 from pydub import AudioSegment
 from openai import OpenAI
 from dotenv import load_dotenv
-
+from jose import jwt
 # Load environment variables from .env
 load_dotenv()
 
