@@ -1,6 +1,6 @@
-# 📞 Customer Sentiment Analysis via Voice Notes
+# 📞 Customer Sentiment Analysis via Automatic Speech Recognition
 
-Welcome to **cusHello** — a customer sentiment analysis system that transforms voice note feedback into actionable insights for businesses.
+AI-powered customer sentiment analysis platform that collects voice feedback from customers, transcribes it using ASR, and analyzes it using LLMs to provide actionable insights to businesses.
 
 ---
 
