@@ -59,6 +59,8 @@ def GetSentimentDistribution():
 
     return jsonify(data)
 
+
+
 @api.route('/GetTopComplaintCategories', methods=['GET'])
 def GetTopComplaintCategories():
     start_date = request.args.get('start_date')
@@ -144,3 +146,71 @@ def GetAverageConfidenceBySentiment():
         data = [{"Sentiment": row[0], "AverageConfidence": row[1]} for row in result]
 
     return jsonify(data)
+
+
+@api.route('/GetCallDetailsWithinDateRange', methods=['GET'])
+def GetCallDetailsWithinDateRange():
+    start_date = request.args.get('start_date')
+    end_date = datetime.strptime(request.args.get('end_date'), '%Y-%m-%d') + timedelta(days=1)
+
+    query = text("""
+        EXEC GetCallDetailsWithinDateRange @StartDate = :start_date, @EndDate = :end_date
+    """)
+
+    with engine.connect() as conn:
+        result = conn.execute(query, {
+            'start_date': start_date,
+            'end_date': end_date
+        })
+
+        data = [{
+            "CallID": row[0],
+            "CustomerNumber": row[1],
+            "AgentName": row[2],
+            "CategoryName": row[3],
+            "TranscribedText": row[4],
+            "Sentiment": row[5],
+            "ActionType": row[6],
+            "AIRecommendations": row[7],
+            "Notes": row[8]
+        } for row in result]
+
+    return jsonify(data)
+
+
+@api.route('/updateCallNote', methods=['POST'])
+def update_call_note():
+    data = request.get_json()
+    call_id = data.get('CallID')
+    new_note = data.get('Notes')
+
+    if not call_id or new_note is None:
+        return jsonify({"error": "CallID and Notes are required"}), 400
+
+    try:
+        with engine.begin() as conn:
+            # Check if CallID exists in SupervisorActions
+            result = conn.execute(
+                text("SELECT 1 FROM SupervisorActions WHERE CallID = :call_id"),
+                {"call_id": call_id}
+            ).first()
+
+            if not result:
+                return jsonify({'error': 'CallID not found in SupervisorActions'}), 404
+
+            # Update Notes and set ActionType to 'Follow-up'
+            conn.execute(
+                text("""
+                    UPDATE SupervisorActions
+                    SET Notes = :new_note,
+                        ActionType = 'Follow-up',
+                        ActionDate = GETDATE()
+                    WHERE CallID = :call_id
+                """),
+                {"new_note": new_note, "call_id": call_id}
+            )
+
+        return jsonify({'message': 'Note and status updated to Follow-up'}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

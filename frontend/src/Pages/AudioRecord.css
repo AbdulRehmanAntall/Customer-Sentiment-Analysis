@@ -1,44 +1,127 @@
+/* AudioRecord.css */
+
 .audio-container {
-    max-width: 600px;
-    margin: 30px auto;
-    padding: 24px;
-    background: #fefefe;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    font-family: 'Segoe UI', sans-serif;
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .audio-container h2 {
     text-align: center;
-    margin-bottom: 20px;
+    color: #343a40;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
 }
 
-.language-select,
-.upload-section,
+.audio-container input[type="text"],
+.audio-container input[type="file"],
+.audio-container select {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.audio-container input[type="text"]::placeholder {
+    color: #6c757d;
+}
+
 .record-controls {
-    margin-bottom: 20px;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    justify-content: center;
+    margin: 1.5rem 0;
 }
 
-.submit-btn {
-    padding: 12px;
-    background: #007BFF;
+.record-controls button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.record-controls button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.record-controls button:not(:disabled):hover {
+    transform: translateY(-2px);
+}
+
+.upload-section {
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.upload-section label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #495057;
+}
+
+.audio-preview {
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.audio-preview audio {
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.audio-preview p {
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.audio-container>button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #28a745;
     color: white;
     border: none;
-    border-radius: 8px;
-    font-weight: bold;
+    border-radius: 4px;
+    font-size: 1rem;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.submit-btn:hover {
-    background: #0056b3;
+.audio-container>button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
 }
 
-.result {
-    margin-top: 20px;
-    background: #f4f4f4;
-    padding: 16px;
-    border-radius: 10px;
+.audio-container>button:not(:disabled):hover {
+    background-color: #218838;
+}
+
+.error-message {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .audio-container {
+        padding: 1rem;
+        margin: 1rem;
+    }
+
+    .audio-container h2 {
+        font-size: 1.3rem;
+    }
 }

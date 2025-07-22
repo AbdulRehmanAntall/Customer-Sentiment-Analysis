@@ -1,34 +1,47 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 import "../Styles/InsertCallRecord.css";
 
 const InsertCallRecord = () => {
+    const location = useLocation();
+    const incomingData = location.state || {};
+
     const [agents, setAgents] = useState([]);
     const [categories, setCategories] = useState([]);
     const [formData, setFormData] = useState({
         CustomerNumber: "",
         AgentID: "",
-        CallDurationInSeconds: "",
-        AudioFilePath: "",
-        CategoryID: "",
-        TranscribedText: "",
-        Language: "English",
-        Sentiment: "Positive",
-        ConfidenceScore: "",
+        AudioFilePath: incomingData.AudioFilePath || "",
+        TranscribedText: incomingData.TranscribedText || "",
+        Language: incomingData.Language || "English",
+        Sentiment: incomingData.Sentiment || "Neutral",
+        ConfidenceScore: incomingData.ConfidenceScore || "",
         ActionType: "Pending",
-        AIRecommendations: "",
-        Notes: ""
+        AIRecommendations: incomingData.AIRecommendations || "",
+        Notes: "",
+        CallDurationInSeconds: incomingData.CallDurationInSeconds || 0,
+        CategoryID: incomingData.CategoryID || ""
     });
+
 
     useEffect(() => {
         axios.get("http://127.0.0.1:5000/api/getallagents")
             .then(res => setAgents(res.data))
-            .catch(err => console.error(err));
+            .catch(console.error);
 
         axios.get("http://127.0.0.1:5000/api/getallcategories")
             .then(res => setCategories(res.data))
-            .catch(err => console.error(err));
+            .catch(console.error);
     }, []);
+
+    useEffect(() => {
+        // Auto-submit if required fields are present
+        if (incomingData.TranscribedText) {
+            const timer = setTimeout(() => handleSubmit(), 2000); // 2s delay
+            return () => clearTimeout(timer);
+        }
+    }, [agents, categories]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -36,19 +49,23 @@ const InsertCallRecord = () => {
     };
 
     const handleSubmit = (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
+
+        if (!formData.CustomerNumber || !formData.AgentID || !formData.CategoryID || !formData.CallDurationInSeconds) {
+            alert("Fill all required fields: Customer Number, Agent, Category, Duration");
+            return;
+        }
 
         axios.post("http://127.0.0.1:5000/insert/InsertCompleteCallRecord", formData)
             .then(res => {
-                alert("✅ Call record added successfully!");
+                alert("✅ Call record submitted!");
                 console.log(res.data);
             })
             .catch(err => {
-                alert("❌ Error while inserting data");
+                alert("❌ Submission failed.");
                 console.error(err);
             });
     };
-
 
     return (
         <div className="insert-call-form">

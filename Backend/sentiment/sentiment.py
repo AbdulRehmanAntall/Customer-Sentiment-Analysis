@@ -37,14 +37,12 @@ def analyze_audio():
     filepath = os.path.join(UPLOAD_FOLDER, filename)
     audio.save(filepath)
 
-    # Convert to MP3 if needed
     if ext != ".mp3":
         sound = AudioSegment.from_file(filepath)
         filepath = filepath.replace(ext, ".mp3")
         sound.export(filepath, format="mp3")
 
     try:
-        # Transcribe
         with open(filepath, "rb") as f:
             transcription = client.audio.transcriptions.create(
                 model="whisper-1",
@@ -55,7 +53,6 @@ def analyze_audio():
         transcript = transcription.text
         translated_text = None
 
-        # Translate if Urdu
         if language == "urdu":
             print("🌐 Translating from Urdu to English...")
             response = client.chat.completions.create(
@@ -66,13 +63,17 @@ def analyze_audio():
                 ]
             )
             translated_text = response.choices[0].message.content.strip()
-           
-        # Sentiment analysis
+
+        # Final text for analysis
         sentiment_input = translated_text if translated_text else transcript
+
+        # 📊 Sentiment Analysis
         blob = TextBlob(sentiment_input)
         polarity = blob.sentiment.polarity
         sentiment_label = "POSITIVE" if polarity > 0 else "NEGATIVE" if polarity < 0 else "NEUTRAL"
-        response = client.chat.completions.create(
+
+        # 🤖 AI Suggestions
+        ai_response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {
@@ -86,28 +87,70 @@ def analyze_audio():
                 },
                 {
                     "role": "user",
-                    "content": f"Transcript: {translated_text if translated_text else transcript}. Sentiment: {sentiment_label}."
+                    "content": f"Transcript: {sentiment_input}. Sentiment: {sentiment_label}."
                 }
             ]
         )
+        ai_suggestions = ai_response.choices[0].message.content.strip()
 
-            
-        
-        ai_suggestions = response.choices[0].message.content.strip()
+        # 🧠 Category Detection
+        categories = [
+            {"id": 1, "name": "Internet Issues"},
+            {"id": 2, "name": "Billing Inquiry"},
+            {"id": 3, "name": "Package Upgrade"},
+            {"id": 4, "name": "Technical Support"},
+            {"id": 5, "name": "Other"},
+            {"id": 6, "name": "Service Outage"},
+            {"id": 7, "name": "New Connection"},
+            {"id": 8, "name": "Account Verification"},
+            {"id": 9, "name": "Payment Issue"},
+            {"id": 10, "name": "Speed Complaint"},
+            {"id": 11, "name": "Equipment Fault"},
+            {"id": 12, "name": "Promotion Inquiry"},
+            {"id": 13, "name": "Complaint Follow-up"},
+            {"id": 14, "name": "Service Migration"},
+            {"id": 15, "name": "VIP Customer Support"},
+        ]
+
+        category_prompt = (
+            "You are a customer service assistant. Based on the following transcript, choose the most relevant category "
+            "from this list:\n\n" +
+            "\n".join([f"{c['id']}: {c['name']}" for c in categories]) +
+            f"\n\nTranscript:\n{sentiment_input}\n\nRespond ONLY with the Category ID and name. Format: {{\"id\": <ID>, \"name\": \"<Category Name>\"}}"
+        )
+
+        cat_response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "Classify the customer issue."},
+                {"role": "user", "content": category_prompt}
+            ]
+        )
+
+        # Extract result from AI response
+        import json
+        try:
+            category_json = json.loads(cat_response.choices[0].message.content.strip())
+        except Exception as e:
+            print("⚠️ Failed to parse category, defaulting to Other.")
+            category_json = {"id": 5, "name": "Other"}  # Default to Other
+
         return jsonify({
-                "file_path": filepath,
-                "transcript": transcript,
-                "translated": translated_text,
-                "sentiment": {
-                    "label": sentiment_label,
-                    "score": polarity,
-                },
-                "ai_suggestions": ai_suggestions
-            })
+            "file_path": filepath,
+            "transcript": transcript,
+            "translated": translated_text,
+            "sentiment": {
+                "label": sentiment_label,
+                "score": polarity,
+            },
+            "ai_suggestions": ai_suggestions,
+            "category": category_json
+        })
 
     except Exception as e:
         print("❌ Error:", e)
         return jsonify({"error": str(e)}), 500
+
 
 @sentiment.route("/health", methods=["GET"])
 def health():
