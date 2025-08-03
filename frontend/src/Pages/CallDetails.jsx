@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import '../Styles/CallDetails.css';
+import moment from 'moment';
 
 const CallDetails = () => {
     const [callDetails, setCallDetails] = useState([]);
@@ -8,12 +9,13 @@ const CallDetails = () => {
     const [error, setError] = useState(null);
     const [categories, setCategories] = useState([]);
 
-    const [startDate, setStartDate] = useState("2025-07-01");
-    const [endDate, setEndDate] = useState("2025-07-20");
+    const [startDate, setStartDate] = useState(moment().subtract(7, 'days').format("YYYY-MM-DD"));
+    const [endDate, setEndDate] = useState(moment().format("YYYY-MM-DD"));
 
     const [selectedCategory, setSelectedCategory] = useState("");
     const [selectedAction, setSelectedAction] = useState("");
     const [selectedSentiment, setSelectedSentiment] = useState("");
+    const [selectedAgent, setSelectedAgent] = useState("");
 
     const [editingNotes, setEditingNotes] = useState({}); // { CallID: newNote }
 
@@ -63,6 +65,7 @@ const CallDetails = () => {
     // Apply filters
     useEffect(() => {
         let filtered = [...callDetails];
+
         if (selectedCategory) {
             filtered = filtered.filter(c => c.CategoryName === selectedCategory);
         }
@@ -72,8 +75,14 @@ const CallDetails = () => {
         if (selectedSentiment) {
             filtered = filtered.filter(c => c.Sentiment === selectedSentiment);
         }
+        if (selectedAgent) {
+            filtered = filtered.filter(c =>
+                c.AgentName && c.AgentName.toLowerCase().includes(selectedAgent.toLowerCase())
+            );
+        }
+
         setFilteredDetails(filtered);
-    }, [selectedCategory, selectedAction, selectedSentiment, callDetails]);
+    }, [selectedCategory, selectedAction, selectedSentiment, selectedAgent, callDetails]);
 
     const handleNoteChange = (id, value) => {
         setEditingNotes(prev => ({ ...prev, [id]: value }));
@@ -167,6 +176,16 @@ const CallDetails = () => {
                             ))}
                         </select>
                     </label>
+                    <label>
+                        Agent Name:{" "}
+                        <input
+                            type="text"
+                            value={selectedAgent}
+                            onChange={(e) => setSelectedAgent(e.target.value)}
+                            placeholder="Enter agent name"
+                        />
+                    </label>
+
                     <label>
                         Action Type:{" "}
                         <select

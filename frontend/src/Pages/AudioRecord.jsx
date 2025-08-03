@@ -3,13 +3,14 @@ import './AudioRecord.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const CallRecorder = () => {
+const AudioRecord = () => {
     const [recording, setRecording] = useState(false);
     const [audioBlob, setAudioBlob] = useState(null);
     const [audioURL, setAudioURL] = useState(null);
     const [audioDuration, setAudioDuration] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
     const [agents, setAgents] = useState([]);
     const [formData, setFormData] = useState({
         CustomerNumber: "",
@@ -77,9 +78,11 @@ const CallRecorder = () => {
 
             mediaRecorder.start(1000); // Request data every second for better duration accuracy
             setRecording(true);
+            setError(null);
+            setSuccess(null);
         } catch (err) {
             console.error("Mic error:", err);
-            setError("Microphone access denied.");
+            setError("Microphone access denied. Please allow microphone permissions.");
         }
     };
 
@@ -105,17 +108,18 @@ const CallRecorder = () => {
 
     const handleSubmit = async () => {
         if (!formData.CustomerNumber || !formData.AgentID || !audioBlob) {
-            alert("Please fill in Customer Number, Agent and record/upload audio.");
+            setError("Please fill in Customer Number, Agent and record/upload audio.");
             return;
         }
 
         if (!audioDuration || audioDuration === 0) {
-            alert("Please wait until audio duration is calculated.");
+            setError("Please wait until audio duration is calculated.");
             return;
         }
 
         setLoading(true);
         setError(null);
+        setSuccess(null);
 
         const formToSend = new FormData();
         formToSend.append("audio", audioBlob);
@@ -150,7 +154,7 @@ const CallRecorder = () => {
             };
 
             await axios.post("http://127.0.0.1:5000/insert/InsertCompleteCallRecord", finalPayload);
-            alert("✅ Call record submitted!");
+            setSuccess("✅ Call record submitted successfully!");
 
             // Clear form
             setFormData({ CustomerNumber: "", AgentID: "" });
@@ -159,7 +163,7 @@ const CallRecorder = () => {
             setAudioDuration(0);
         } catch (err) {
             console.error("Error:", err);
-            setError("Submission failed.");
+            setError("Submission failed. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -167,64 +171,106 @@ const CallRecorder = () => {
 
     return (
         <div className="audio-container">
-            <h2>📞 Call Recorder & Submission</h2>
+            <div className="call-recorder-wrapper">
+                <div className="left-section">
+                    <h2>Customer Voice Review</h2>
+                    <p className="subtitle">
+                        We found that customers express themselves better when they give feedback via voice notes.
+                    </p>
 
-            <input
-                name="CustomerNumber"
-                value={formData.CustomerNumber}
-                onChange={handleChange}
-                placeholder="📱 Customer Number"
-                required
-            />
+                    <div className="form-group">
+                        <label>Customer Phone Number</label>
+                        <input
+                            name="CustomerNumber"
+                            value={formData.CustomerNumber}
+                            onChange={handleChange}
+                            placeholder="Enter customer phone number"
+                            required
+                        />
+                    </div>
 
-            <select name="AgentID" value={formData.AgentID} onChange={handleChange} required>
-                <option value="">👤 Select Agent</option>
-                {agents.map(agent => (
-                    <option key={agent.AgentId} value={agent.AgentId}>
-                        {agent.AgentName}
-                    </option>
-                ))}
-            </select>
+                    <div className="form-group">
+                        <label>Agent</label>
+                        <select
+                            name="AgentID"
+                            value={formData.AgentID}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Select Agent</option>
+                            {agents.map(agent => (
+                                <option key={agent.AgentId} value={agent.AgentId}>
+                                    {agent.AgentName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
 
-            <div className="record-controls">
-                {!recording ? (
-                    <button onClick={handleStartRecording} disabled={loading}>🔴 Start Recording</button>
-                ) : (
-                    <button onClick={handleStopRecording}>⏹ Stop</button>
-                )}
+                <div className="right-section">
+                    <div className="recording-control">
+                        <button
+                            className={`record-button ${recording ? 'recording' : ''}`}
+                            onClick={recording ? handleStopRecording : handleStartRecording}
+                            disabled={loading}
+                        >
+                            {recording ? (
+                                <span className="pulse-animation">⏹ Stop</span>
+                            ) : (
+                                <span>🔴 Record</span>
+                            )}
+                        </button>
+                        <p className="recording-status">
+                            {recording ? "Recording in progress..." : "Click to start recording"}
+                        </p>
+                    </div>
+
+                    {audioURL && (
+                        <div className="audio-player">
+                            <h4>Your Recording</h4>
+                            <audio
+                                ref={audioRef}
+                                controls
+                                src={audioURL}
+                                onLoadedMetadata={() => {
+                                    if (audioRef.current) {
+                                        setAudioDuration(Math.round(audioRef.current.duration));
+                                    }
+                                }}
+                            />
+                            <div className="audio-duration">Duration: {audioDuration} seconds</div>
+                        </div>
+                    )}
+
+                    <button
+                        className="submit-button"
+                        onClick={handleSubmit}
+                        disabled={loading || recording || !audioBlob || audioDuration === 0}
+                    >
+                        {loading ? "Processing..." : "Submit Review"}
+                    </button>
+                </div>
             </div>
 
-            <div className="upload-section">
-                <label>📂 Or Upload:</label>
-                <input type="file" accept="audio/*" onChange={handleUpload} disabled={loading} />
-            </div>
-
-            {audioURL && (
-                <div className="audio-preview">
-                    <audio
-                        ref={audioRef}
-                        controls
-                        src={audioURL}
-                        onLoadedMetadata={() => {
-                            if (audioRef.current) {
-                                setAudioDuration(Math.round(audioRef.current.duration));
-                            }
-                        }}
-                    ></audio>
-                    <p>⏱ Duration: {audioDuration} sec</p>
+            {error && (
+                <div className="message-popup error">
+                    <div className="message-content">
+                        <span className="message-icon">❌</span>
+                        <span>{error}</span>
+                    </div>
                 </div>
             )}
 
-            <button
-                onClick={handleSubmit}
-                disabled={loading || recording || !audioBlob || audioDuration === 0}
-            >
-                {loading ? "🔄 Submitting..." : "📤 Submit Call"}
-            </button>
-
-            {error && <div className="error-message">❌ {error}</div>}
+            {success && (
+                <div className="message-popup success">
+                    <div className="message-content">
+                        <span className="message-icon">✓</span>
+                        <span>{success}</span>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
-export default CallRecorder;
+export default AudioRecord;

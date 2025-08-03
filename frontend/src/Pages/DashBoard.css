@@ -184,3 +184,14 @@ tr:hover {
         text-align: left;
     }
 }
+
+.details-button {
+    background-color: #ADD8E6;
+    /* baby blue */
+    color: black;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}

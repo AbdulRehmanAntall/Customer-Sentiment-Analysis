@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Card, DatePicker, Row, Col, Spin, Table, Typography } from 'antd';
 import {
   BarChart,
@@ -42,9 +44,14 @@ const DashBoard = () => {
     avgConfidenceBySentiment: []
   });
 
+
+
+
   useEffect(() => {
     fetchDashboardData();
   }, [dateRange]);
+
+
 
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -150,6 +157,10 @@ const DashBoard = () => {
       ellipsis: true
     },
   ];
+  const navigate = useNavigate();
+  const goToDetail = () => {
+    navigate('/details');
+  };
 
   return (
     <div className="dashboard-container">
@@ -170,29 +181,31 @@ const DashBoard = () => {
         <>
           <Row gutter={[16, 16]} className="dashboard-row">
             <Col span={12}>
-              <Card title="Total Calls per Agent">
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={dashboardData.callsPerAgent}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="AgentName" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="TotalCalls" fill="#8884d8" />
-                  </BarChart>
-                </ResponsiveContainer>
+              <Card title="Top Called Agents">
+                <div style={{ maxHeight: 320, overflowY: 'auto' }}>
+                  <ResponsiveContainer width="100%" height={dashboardData.callsPerAgent.length * 40}>
+                    <BarChart data={dashboardData.callsPerAgent}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="AgentName" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="TotalCalls" fill="#8884d8" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </Card>
             </Col>
             <Col span={12}>
               <Card title="Sentiment Distribution">
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={320}>
                   <PieChart>
                     <Pie
                       data={dashboardData.sentimentDistribution}
                       cx="50%"
                       cy="50%"
-                      labelLine={false}
-                      outerRadius={80}
+                      labelLine={true}
+                      outerRadius={120}
                       fill="#8884d8"
                       dataKey="Sentiment Count"
                       nameKey="Sentiment"
@@ -212,29 +225,29 @@ const DashBoard = () => {
           <Row gutter={[16, 16]} className="dashboard-row">
             <Col span={12}>
               <Card title="Top Complaint Categories">
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart
-                    layout="vertical"
-                    data={dashboardData.topCategories}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis dataKey="CategoryName" type="category" />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="CategoryCount" fill="#82ca9d" />
-                  </BarChart>
-                </ResponsiveContainer>
+                <div style={{ maxHeight: 320, overflowY: 'auto' }}>
+                  <ResponsiveContainer width="100%" height={dashboardData.topCategories.length * 40}>
+                    <BarChart layout="vertical" data={dashboardData.topCategories}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis type="number" />
+                      <YAxis dataKey="CategoryName" type="category" />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="CategoryCount" fill="#82ca9d" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </Card>
             </Col>
             <Col span={12}>
               <Card title="Agent Sentiment Stats">
                 <Table
+                  rowKey="AgentName"
                   columns={agentColumns}
                   dataSource={dashboardData.agentSentimentStats}
                   size="small"
                   pagination={false}
-                  scroll={{ y: 240 }}
+                  scroll={{ y: 300 }}
                 />
               </Card>
             </Col>
@@ -262,13 +275,16 @@ const DashBoard = () => {
             </Col>
             <Col span={12}>
               <Card title="Recent Supervisor Actions">
+
                 <Table
+                  rowKey="ActionDate"
                   columns={actionsColumns}
                   dataSource={dashboardData.supervisorActions}
                   size="small"
                   pagination={false}
-                  scroll={{ y: 240 }}
+                  scroll={{ y: 300 }}
                 />
+                <button onClick={goToDetail} className="details-button">Go to Details</button>
               </Card>
             </Col>
           </Row>
@@ -276,7 +292,7 @@ const DashBoard = () => {
           <Row gutter={[16, 16]} className="dashboard-row">
             <Col span={12}>
               <Card title="Agent Average Call Duration (seconds)">
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={dashboardData.agentAvgDuration.length * 40}>
                   <BarChart data={dashboardData.agentAvgDuration}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="AgentName" />
